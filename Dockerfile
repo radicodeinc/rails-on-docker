@@ -1,6 +1,18 @@
 FROM centos:7
 MAINTAINER kotera@radicode.co.jp
 
+RUN sed -i -e '/override_install_langs/s/$/,ja_JP.utf8/g' /etc/yum.conf
+RUN yum -y reinstall glibc-common
+RUN localedef -v -c -i ja_JP -f UTF-8 ja_JP.UTF-8; echo "";
+
+ENV LANG="ja_JP.UTF-8" \
+    LANGUAGE="ja_JP:ja" \
+    LC_ALL="ja_JP.UTF-8"
+RUN rm -f /etc/localtime
+RUN ln -fs /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+
+CMD date
+
 # rubyとrailsのバージョンを指定
 ENV ruby_ver="2.5.1"
 ENV rails_ver="5.1.4"
