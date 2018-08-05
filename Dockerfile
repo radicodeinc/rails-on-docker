@@ -35,10 +35,6 @@ RUN echo 'export RBENV_ROOT="/usr/local/rbenv"' >> /etc/profile.d/rbenv.sh
 RUN echo 'export PATH="${RBENV_ROOT}/bin:${PATH}"' >> /etc/profile.d/rbenv.sh
 RUN echo 'eval "$(rbenv init --no-rehash -)"' >> /etc/profile.d/rbenv.sh
 
-# rubyとrailsをインストール
-RUN source /etc/profile.d/rbenv.sh; rbenv install ${ruby_ver}; rbenv global ${ruby_ver}
-RUN source /etc/profile.d/rbenv.sh; gem update --system; gem install --version ${rails_ver} --no-ri --no-rdoc rails; gem install bundle
-
 ENV RBENV_ROOT="/usr/local/rbenv" \
     GEM_HOME="/usr/local/bundle" 
 ENV BUNDLE_PATH="$GEM_HOME" \
@@ -48,4 +44,9 @@ ENV BUNDLE_PATH="$GEM_HOME" \
 ENV PATH="$BUNDLE_BIN:$PATH"
 RUN mkdir -p "$GEM_HOME" "$BUNDLE_BIN" \
     && chmod 777 "$GEM_HOME" "$BUNDLE_BIN"
+
+
+# rubyとrailsをインストール
+RUN source /etc/profile.d/rbenv.sh; rbenv install ${ruby_ver}; rbenv global ${ruby_ver}
+RUN source /etc/profile.d/rbenv.sh; gem update --system; gem install --version ${rails_ver} --no-ri --no-rdoc rails; gem install bundle
 
