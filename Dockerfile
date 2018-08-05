@@ -43,10 +43,13 @@ ENV BUNDLE_PATH="$GEM_HOME" \
     BUNDLE_APP_CONFIG="$GEM_HOME"
 ENV PATH="$BUNDLE_BIN:$RBENV_ROOT/bin:$PATH"
 RUN mkdir -p "$GEM_HOME" "$BUNDLE_BIN" \
-    && chmod 777 "$GEM_HOME" "$BUNDLE_BIN"
+    && chmod 775 "$GEM_HOME" "$BUNDLE_BIN" \
+    # Check Ruby & RubyGems installation.
+    && ruby -v \
+    && gem -v
 
 
 # rubyとrailsをインストール
 RUN source /etc/profile.d/rbenv.sh; rbenv install ${ruby_ver}; rbenv global ${ruby_ver}
-RUN source /etc/profile.d/rbenv.sh; gem update --system; gem install --version ${rails_ver} --no-ri --no-rdoc rails; gem install bundle
+RUN source /etc/profile.d/rbenv.sh; gem update --system; gem install --version ${rails_ver} --no-ri --no-rdoc rails; gem install bundle; bundle -v
 
