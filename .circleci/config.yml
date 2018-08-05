@@ -70,6 +70,7 @@ workflows:
           tags:
             only: /.*/
     - push_tag:
+        context: org-global
         requires:
         - build
         filters:
@@ -78,6 +79,7 @@ workflows:
           tags:
             only: /.*/
     - push_master_branch:
+        context: org-global
         requires:
         - build
         filters:
