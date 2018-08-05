@@ -1,0 +1,85 @@
+alias:
+  default_env: &default_env
+    docker:
+    - image: circleci/golang:1.9.3
+    working_directory: /tmp/workspace
+    environment:
+      OWNER: radicode
+      IMAGE_NAME: rails-on-docker
+  setup_remote_docker: &setup_remote_docker
+    version: 17.11.0-ce
+    docker_layer_caching: true
+
+version: 2
+jobs:
+  build:
+    <<: *default_env
+    steps:
+    - setup_remote_docker: *setup_remote_docker
+    - checkout
+    - run:
+        name: Build
+        command: docker build -t ${OWNER}/${IMAGE_NAME}:latest .
+    - run:
+        name: Save image
+        command: docker image save ${OWNER}/${IMAGE_NAME}:latest > ./docker-image.tar
+    - persist_to_workspace:
+        root: .
+        paths:
+        - ./docker-image.tar
+  push_tag:
+    <<: *default_env
+    steps:
+    - setup_remote_docker: *setup_remote_docker
+    - attach_workspace:
+        at: .
+    - run:
+        name: Load image from tar
+        command: docker load -i ./docker-image.tar
+    - run:
+        name: Tag to latest
+        command: docker tag ${OWNER}/${IMAGE_NAME}:latest ${OWNER}/${IMAGE_NAME}:$CIRCLE_TAG
+    - run:
+        name: Docker Login
+        command: docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+    - run:
+        name: Push image to registory
+        command: docker push ${OWNER}/${IMAGE_NAME}
+  push_master_branch:
+    <<: *default_env
+    steps:
+    - setup_remote_docker: *setup_remote_docker
+    - attach_workspace:
+        at: .
+    - run:
+        name: Load image from tar
+        command: docker load -i ./docker-image.tar
+    - run:
+        name: Docker Login
+        command: docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+    - run:
+        name: Push image to registory
+        command: docker push ${OWNER}/${IMAGE_NAME}
+
+workflows:
+  version: 2
+  build:
+    jobs:
+    - build:
+        filters:
+          tags:
+            only: /.*/
+    - push_tag:
+        requires:
+        - build
+        filters:
+          branches:
+            ignore: /.*/
+          tags:
+            only: /.*/
+    - push_master_branch:
+        requires:
+        - build
+        filters:
+          branches:
+            only: master
