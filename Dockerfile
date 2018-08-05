@@ -46,6 +46,6 @@ RUN mkdir -p "$GEM_HOME" "$BUNDLE_BIN" \
     && chmod 775 "$GEM_HOME" "$BUNDLE_BIN" 
 
 # rubyとrailsをインストール
-RUN source /etc/profile.d/rbenv.sh; rbenv install ${ruby_ver}; rbenv global ${ruby_ver}; ruby -v; gem -v;
+RUN source /etc/profile.d/rbenv.sh; MAKE_OPTS="-j 4" RUBY_BUILD_CURL_OPTS=--tlsv1.2 rbenv install ${ruby_ver}; rbenv global ${ruby_ver}; ruby -v; gem -v;
 RUN source /etc/profile.d/rbenv.sh; gem update --system; gem install --version ${rails_ver} --no-ri --no-rdoc rails; gem install bundle; bundle -v;
 
