@@ -11,29 +11,27 @@ ENV LANG="ja_JP.UTF-8" \
 RUN rm -f /etc/localtime
 RUN ln -fs /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
 
-CMD date
-
-RUN rpm --import http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-7
-RUN rpm --import http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
+RUN rpm --import http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-7 \
+    && rpm --import http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
 
 # rubyとrailsのバージョンを指定
-ENV ruby_ver="2.5.1"
-ENV rails_ver="5.1.4"
+ENV ruby_ver="2.5.1" \
+    rails_ver="5.1.4"
 
 # 必要なパッケージをインストール
-RUN yum -y update
-RUN yum -y install epel-release
-RUN yum -y install vim which git make autoconf curl wget gcc-c++ glibc-headers openssl-devel readline libyaml-devel readline-devel zlib zlib-devel sqlite-devel bzip2
-RUN yum clean all
+RUN yum -y update \
+    && yum -y install epel-release \
+    && yum -y install vim which git make autoconf curl wget gcc-c++ glibc-headers openssl-devel readline libyaml-devel readline-devel zlib zlib-devel sqlite-devel bzip2 \
+    && yum clean all
 
 # rubyとbundleをダウンロード
-RUN git clone https://github.com/sstephenson/rbenv.git /usr/local/rbenv
-RUN git clone https://github.com/sstephenson/ruby-build.git /usr/local/rbenv/plugins/ruby-build
+RUN git clone https://github.com/sstephenson/rbenv.git /usr/local/rbenv \
+    && git clone https://github.com/sstephenson/ruby-build.git /usr/local/rbenv/plugins/ruby-build
 
 # コマンドでrbenvが使えるように設定
-RUN echo 'export RBENV_ROOT="/usr/local/rbenv"' >> /etc/profile.d/rbenv.sh
-RUN echo 'export PATH="${RBENV_ROOT}/bin:${PATH}"' >> /etc/profile.d/rbenv.sh
-RUN echo 'eval "$(rbenv init --no-rehash -)"' >> /etc/profile.d/rbenv.sh
+RUN echo 'export RBENV_ROOT="/usr/local/rbenv"' >> /etc/profile.d/rbenv.sh \
+    && echo 'export PATH="${RBENV_ROOT}/bin:${PATH}"' >> /etc/profile.d/rbenv.sh \
+    && echo 'eval "$(rbenv init --no-rehash -)"' >> /etc/profile.d/rbenv.sh
 
 ENV RBENV_ROOT="/usr/local/rbenv" \
     GEM_HOME="/usr/local/bundle" 
