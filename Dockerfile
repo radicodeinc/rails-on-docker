@@ -13,6 +13,9 @@ RUN ln -fs /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
 
 CMD date
 
+RUN rpm --import http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-7
+RUN rpm --import http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
+
 # rubyとrailsのバージョンを指定
 ENV ruby_ver="2.5.1"
 ENV rails_ver="5.1.4"
